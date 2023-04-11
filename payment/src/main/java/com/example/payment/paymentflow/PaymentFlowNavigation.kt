@@ -18,7 +18,12 @@ private const val cardNumberRoute = "cardNumber"
 private const val confirmationRoute = "confirmation"
 
 //TODO: PK - Passing in navController?
-fun NavGraphBuilder.paymentFlow(navController: NavController, onCancel: () -> Unit) {
+fun NavGraphBuilder.paymentFlow(
+    navController: NavController,
+    onCancel: () -> Unit,
+    onComplete: () -> Unit,
+    resultReceiverProvider: @Composable (NavBackStackEntry) -> PaymentResultReceiver
+) {
     navigation(startDestination = addressRoute, route = paymentFlowRoute) {
         composable(addressRoute) { backStackEntry ->
             AddressRoute(
@@ -38,11 +43,13 @@ fun NavGraphBuilder.paymentFlow(navController: NavController, onCancel: () -> Un
             )
         }
         composable(confirmationRoute) { backStackEntry ->
-            ConfirmationRoute(
-                navController.getFlowViewModel(
-                    backStackEntry = backStackEntry
-                )
-            )
+            val resultReceiver = resultReceiverProvider(backStackEntry)
+            ConfirmationRoute(navController.getFlowViewModel(
+                backStackEntry = backStackEntry
+            ), onSubmit = {
+                resultReceiver.receiveResult(it)
+                onComplete()
+            })
         }
     }
 }
