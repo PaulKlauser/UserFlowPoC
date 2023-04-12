@@ -53,9 +53,11 @@ class MainActivity : ComponentActivity() {
                         )
                     }, onComplete = {
                         navController.popBackStack(
-                            route = mainRoute(), inclusive = true
+                            route = mainRoute(), inclusive = false
                         )
-                        navController.navigate(route = mainRoute(it))
+                        navController.navigate(route = mainRoute(it)) {
+                            launchSingleTop = true
+                        }
                     })
                 }
             }
