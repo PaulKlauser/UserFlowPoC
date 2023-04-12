@@ -1,25 +1,28 @@
 package com.example.payment.paymentflow.address
 
 import androidx.lifecycle.ViewModel
-import com.example.payment.paymentflow.PaymentFlowViewModel
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.asStateFlow
+import androidx.lifecycle.viewModelScope
+import com.example.payment.paymentflow.PaymentFlowRepo
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 
-class AddressViewModel(private val flowViewModel: PaymentFlowViewModel) : ViewModel() {
+class AddressViewModel(private val paymentRepo: PaymentFlowRepo) : ViewModel() {
 
-    private val _uiState =
-        MutableStateFlow(flowViewModel.state.value.let { AddressUiState(it.name, it.address) })
-    val uiState = _uiState.asStateFlow()
+    val uiState = paymentRepo.paymentFlowState.map {
+        AddressUiState(
+            name = it.name,
+            address = it.address
+        )
+    }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), AddressUiState("", ""))
 
     fun setName(name: String) {
-        _uiState.update { it.copy(name = name) }
-        flowViewModel.setName(name)
+        paymentRepo.paymentFlowState.update { it.copy(name = name) }
     }
 
     fun setAddress(address: String) {
-        _uiState.update { it.copy(address = address) }
-        flowViewModel.setAddress(address)
+        paymentRepo.paymentFlowState.update { it.copy(address = address) }
     }
 
 }

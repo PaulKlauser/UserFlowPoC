@@ -14,21 +14,25 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.example.payment.paymentflow.PaymentFlowRepo
 import com.example.payment.paymentflow.PaymentFlowState
-import com.example.payment.paymentflow.PaymentFlowViewModel
+import com.ramcosta.composedestinations.annotation.Destination
+import com.ramcosta.composedestinations.result.ResultBackNavigator
 
 @Composable
+@Destination
 fun ConfirmationRoute(
-    flowViewModel: PaymentFlowViewModel,
-    onSubmit: (PaymentFlowState) -> Unit
+    paymentFlowRepo: PaymentFlowRepo,
+    resultBackNavigator: ResultBackNavigator<PaymentFlowState>
 ) {
-    val viewModel = viewModel(initializer = { ConfirmationViewModel(flowViewModel) })
+    val viewModel = viewModel(initializer = { ConfirmationViewModel(paymentFlowRepo) })
     val uiState by viewModel.uiState.collectAsState()
     ConfirmationScreen(
         name = uiState.name,
         address = uiState.address,
         cardNumber = uiState.cardNumber,
-        onSubmit = onSubmit
+        // So this only allows navigating back one screen, I can't pop the whole flow
+        onSubmit = { resultBackNavigator.navigateBack(it) }
     )
 }
 

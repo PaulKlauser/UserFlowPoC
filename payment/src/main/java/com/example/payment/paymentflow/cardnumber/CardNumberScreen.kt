@@ -15,17 +15,22 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
-import com.example.payment.paymentflow.PaymentFlowViewModel
+import androidx.navigation.NavController
+import com.example.payment.paymentflow.PaymentFlowRepo
+import com.example.payment.paymentflow.destinations.ConfirmationRouteDestination
+import com.ramcosta.composedestinations.annotation.Destination
+import com.ramcosta.composedestinations.navigation.navigate
 
 @Composable
-fun CardNumberRoute(onNext: () -> Unit, onCancel: () -> Unit, flowViewModel: PaymentFlowViewModel) {
-    val viewModel = viewModel(initializer = { CardNumberViewModel(flowViewModel) })
+@Destination
+fun CardNumberRoute(flowRepo: PaymentFlowRepo, navController: NavController) {
+    val viewModel = viewModel(initializer = { CardNumberViewModel(flowRepo) })
     val uiState by viewModel.uiState.collectAsState()
     CardNumberScreen(
         cardNumber = uiState.cardNumber,
         onCardNumberChanged = viewModel::setCardNumber,
-        onNext = onNext,
-        onCancel = onCancel
+        onNext = { navController.navigate(ConfirmationRouteDestination) },
+        onCancel = {  }
     )
 }
 

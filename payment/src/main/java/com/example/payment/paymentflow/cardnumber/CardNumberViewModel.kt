@@ -1,19 +1,20 @@
 package com.example.payment.paymentflow.cardnumber
 
 import androidx.lifecycle.ViewModel
-import com.example.payment.paymentflow.PaymentFlowViewModel
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.asStateFlow
+import androidx.lifecycle.viewModelScope
+import com.example.payment.paymentflow.PaymentFlowRepo
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 
-class CardNumberViewModel(private val flowViewModel: PaymentFlowViewModel) : ViewModel() {
+class CardNumberViewModel(private val flowRepo: PaymentFlowRepo) : ViewModel() {
 
-    private val _uiState = MutableStateFlow(flowViewModel.state.value.let { CardNumberUiState(it.cardNumber) })
-    val uiState = _uiState.asStateFlow()
+    val uiState = flowRepo.paymentFlowState.map { CardNumberUiState(it.cardNumber) }
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), CardNumberUiState(""))
 
     fun setCardNumber(cardNumber: String) {
-        _uiState.update { it.copy(cardNumber = cardNumber) }
-        flowViewModel.setCardNumber(cardNumber)
+        flowRepo.paymentFlowState.update { it.copy(cardNumber = cardNumber) }
     }
 
 }
