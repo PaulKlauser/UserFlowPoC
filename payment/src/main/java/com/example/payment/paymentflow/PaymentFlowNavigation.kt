@@ -21,8 +21,7 @@ private const val confirmationRoute = "confirmation"
 fun NavGraphBuilder.paymentFlow(
     navController: NavController,
     onCancel: () -> Unit,
-    onComplete: () -> Unit,
-    resultReceiverProvider: @Composable (NavBackStackEntry) -> PaymentResultReceiver
+    onComplete: (PaymentFlowState) -> Unit
 ) {
     navigation(startDestination = addressRoute, route = paymentFlowRoute) {
         composable(addressRoute) { backStackEntry ->
@@ -43,12 +42,10 @@ fun NavGraphBuilder.paymentFlow(
             )
         }
         composable(confirmationRoute) { backStackEntry ->
-            val resultReceiver = resultReceiverProvider(backStackEntry)
             ConfirmationRoute(navController.getFlowViewModel(
                 backStackEntry = backStackEntry
             ), onSubmit = {
-                resultReceiver.receiveResult(it)
-                onComplete()
+                onComplete(it)
             })
         }
     }

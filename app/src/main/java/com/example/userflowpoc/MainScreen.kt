@@ -7,7 +7,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material.Button
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextAlign
@@ -17,10 +16,10 @@ import com.example.payment.paymentflow.PaymentFlowState
 
 @Composable
 fun MainRoute(
-    viewModel: MainViewModel,
-    onPaymentFlow: () -> Unit
+    onPaymentFlow: () -> Unit,
+    paymentFlowState: PaymentFlowState?
 ) {
-    MainScreen(onPaymentFlow = onPaymentFlow, viewModel.paymentFlowState.collectAsState().value)
+    MainScreen(onPaymentFlow = onPaymentFlow, paymentFlowState)
 }
 
 @Composable
