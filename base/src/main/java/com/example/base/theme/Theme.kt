@@ -1,4 +1,4 @@
-package com.example.userflowpoc.ui.theme
+package com.example.base.theme
 
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.material.MaterialTheme

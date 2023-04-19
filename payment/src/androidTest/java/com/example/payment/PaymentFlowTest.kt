@@ -9,7 +9,6 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.rememberNavController
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.example.payment.paymentflow.PaymentFlowState
-import com.example.payment.paymentflow.PaymentResultReceiver
 import com.example.payment.paymentflow.paymentFlow
 import com.example.payment.paymentflow.paymentFlowRoute
 import org.junit.Assert.assertEquals
@@ -31,14 +30,7 @@ class PaymentFlowTest {
             NavHost(navController = navController, startDestination = paymentFlowRoute) {
                 paymentFlow(navController = navController,
                     onCancel = {},
-                    onComplete = {},
-                    resultReceiverProvider = {
-                        object : PaymentResultReceiver {
-                            override fun receiveResult(result: PaymentFlowState) {
-                                actualResult = result
-                            }
-                        }
-                    })
+                    onComplete = { actualResult = it })
             }
         }
 
