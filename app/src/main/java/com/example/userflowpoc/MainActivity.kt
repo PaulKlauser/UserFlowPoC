@@ -1,6 +1,5 @@
 package com.example.userflowpoc
 
-import android.net.Uri
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -13,19 +12,18 @@ import com.example.payment.paymentflow.PaymentFlowStateType
 import com.example.payment.paymentflow.paymentFlow
 import com.example.payment.paymentflow.paymentFlowRoute
 import com.example.userflowpoc.ui.theme.UserFlowPocTheme
-import kotlinx.serialization.encodeToString
-import kotlinx.serialization.json.Json
 
-private fun mainRoute(arg: PaymentFlowState? = null): String {
-    val argString = if (arg != null) {
-        Uri.encode(Json.encodeToString(arg))
+const val MAIN = "main"
+const val PAYMENT_FLOW_RESULT_KEY = "paymentFlowResult"
+const val MAIN_ROUTE = "$MAIN?$PAYMENT_FLOW_RESULT_KEY={$PAYMENT_FLOW_RESULT_KEY}"
+
+private fun mainDestination(arg: PaymentFlowState? = null): String {
+    return if (arg != null) {
+        "$MAIN?$PAYMENT_FLOW_RESULT_KEY=${PaymentFlowStateType.serializeAsValue(arg)}"
     } else {
-        "{$ARG_KEY}"
+        MAIN
     }
-    return "main?$ARG_KEY=$argString"
 }
-
-private const val ARG_KEY = "arg"
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -33,10 +31,10 @@ class MainActivity : ComponentActivity() {
         setContent {
             UserFlowPocTheme {
                 val navController = rememberNavController()
-                NavHost(navController = navController, startDestination = mainRoute()) {
+                NavHost(navController = navController, startDestination = MAIN_ROUTE) {
                     composable(
-                        route = mainRoute(), arguments = listOf(
-                            navArgument(ARG_KEY) {
+                        route = MAIN_ROUTE, arguments = listOf(
+                            navArgument(PAYMENT_FLOW_RESULT_KEY) {
                                 type = PaymentFlowStateType
                                 defaultValue = null
                                 nullable = true
@@ -44,18 +42,18 @@ class MainActivity : ComponentActivity() {
                         )) {
                         MainRoute(
                             onPaymentFlow = { navController.navigate(route = paymentFlowRoute) },
-                            paymentFlowState = it.arguments?.getParcelable(ARG_KEY)
+                            paymentFlowState = it.arguments?.getParcelable(PAYMENT_FLOW_RESULT_KEY)
                         )
                     }
                     paymentFlow(navController = navController, onCancel = {
                         navController.popBackStack(
-                            route = mainRoute(), inclusive = false
+                            route = MAIN_ROUTE, inclusive = false
                         )
                     }, onComplete = {
                         navController.popBackStack(
-                            route = mainRoute(), inclusive = false
+                            route = MAIN_ROUTE, inclusive = false
                         )
-                        navController.navigate(route = mainRoute(it)) {
+                        navController.navigate(route = mainDestination(it)) {
                             launchSingleTop = true
                         }
                     })
